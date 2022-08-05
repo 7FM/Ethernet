@@ -1,13 +1,12 @@
 // DHCP Library v0.3 - April 25, 2009
 // Author: Jordan Terrell - blog.jordanterrell.com
 
-#include <Arduino.h>
+#include "Ethernet.h"
 
 #include "Dhcp.h"
-#include "Ethernet.h"
 #include "utility/w5100.h"
 
-int DhcpClass::beginWithDHCP(uint8_t *mac, unsigned long timeout, unsigned long responseTimeout) {
+int DhcpClass::beginWithDHCP(const uint8_t *mac, unsigned long timeout, unsigned long responseTimeout) {
     _dhcpLeaseTime = 0;
     _dhcpT1 = 0;
     _dhcpT2 = 0;
@@ -388,23 +387,23 @@ int DhcpClass::checkLease() {
     return rc;
 }
 
-IPAddress DhcpClass::getLocalIp() {
+IPAddress DhcpClass::getLocalIp() const {
     return IPAddress(_dhcpLocalIp);
 }
 
-IPAddress DhcpClass::getSubnetMask() {
+IPAddress DhcpClass::getSubnetMask() const {
     return IPAddress(_dhcpSubnetMask);
 }
 
-IPAddress DhcpClass::getGatewayIp() {
+IPAddress DhcpClass::getGatewayIp() const {
     return IPAddress(_dhcpGatewayIp);
 }
 
-IPAddress DhcpClass::getDhcpServerIp() {
+IPAddress DhcpClass::getDhcpServerIp() const {
     return IPAddress(_dhcpDhcpServerIp);
 }
 
-IPAddress DhcpClass::getDnsServerIp() {
+IPAddress DhcpClass::getDnsServerIp() const {
     return IPAddress(_dhcpDnsServerIp);
 }
 

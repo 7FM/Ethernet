@@ -20,7 +20,6 @@
 
 #include "Ethernet.h"
 #include "utility/w5100.h"
-#include <Arduino.h>
 
 uint16_t EthernetServer::server_port[MAX_SOCK_NUM];
 
@@ -106,7 +105,7 @@ EthernetClient EthernetServer::accept() {
     return EthernetClient(sockindex);
 }
 
-EthernetServer::operator bool() {
+EthernetServer::operator bool() const {
     uint8_t maxindex = MAX_SOCK_NUM;
 #if MAX_SOCK_NUM > 4
     if (W5100.getChip() == 51)

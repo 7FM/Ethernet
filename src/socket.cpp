@@ -20,7 +20,6 @@
 
 #include "Ethernet.h"
 #include "utility/w5100.h"
-#include <Arduino.h>
 
 #if ARDUINO >= 156 && !defined(ARDUINO_ARCH_PIC32)
 extern void yield(void);
@@ -236,7 +235,7 @@ uint8_t EthernetClass::socketListen(uint8_t s) {
 
 // establish a TCP connection in Active (client) mode.
 //
-void EthernetClass::socketConnect(uint8_t s, uint8_t *addr, uint16_t port) {
+void EthernetClass::socketConnect(uint8_t s, const uint8_t *addr, uint16_t port) {
     // set destination IP
     SPI.beginTransaction(SPI_ETHERNET_SETTINGS);
     W5100.writeSnDIPR(s, addr);
@@ -481,7 +480,7 @@ uint16_t EthernetClass::socketBufferData(uint8_t s, uint16_t offset, const uint8
     return ret;
 }
 
-bool EthernetClass::socketStartUDP(uint8_t s, uint8_t *addr, uint16_t port) {
+bool EthernetClass::socketStartUDP(uint8_t s, const uint8_t *addr, uint16_t port) {
     if (((addr[0] == 0x00) && (addr[1] == 0x00) && (addr[2] == 0x00) && (addr[3] == 0x00)) ||
         ((port == 0x00))) {
         return false;

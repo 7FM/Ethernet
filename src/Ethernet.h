@@ -51,7 +51,6 @@
 #include "Client.h"
 #include "Server.h"
 #include "Udp.h"
-#include <Arduino.h>
 
 enum EthernetLinkStatus {
     Unknown,
@@ -80,23 +79,23 @@ class EthernetClass {
     // Initialise the Ethernet shield to use the provided MAC address and
     // gain the rest of the configuration through DHCP.
     // Returns 0 if the DHCP configuration failed, and 1 if it succeeded
-    static int begin(uint8_t *mac, unsigned long timeout = 60000, unsigned long responseTimeout = 4000);
+    static int begin(const uint8_t *mac, unsigned long timeout = 60000, unsigned long responseTimeout = 4000);
     static int maintain();
     static EthernetLinkStatus linkStatus();
     static EthernetHardwareStatus hardwareStatus();
 
     // Manual configuration
-    static void begin(uint8_t *mac, IPAddress ip);
-    static void begin(uint8_t *mac, IPAddress ip, IPAddress dns);
-    static void begin(uint8_t *mac, IPAddress ip, IPAddress dns, IPAddress gateway);
-    static void begin(uint8_t *mac, IPAddress ip, IPAddress dns, IPAddress gateway, IPAddress subnet);
+    static void begin(const uint8_t *mac, const IPAddress &ip);
+    static void begin(const uint8_t *mac, const IPAddress &ip, const IPAddress &dns);
+    static void begin(const uint8_t *mac, const IPAddress &ip, const IPAddress &dns, const IPAddress &gateway);
+    static void begin(const uint8_t *mac, const IPAddress &ip, const IPAddress &dns, const IPAddress &gateway, const IPAddress &subnet);
     static void init(uint8_t sspin = 10);
 
     static void MACAddress(uint8_t *mac_address);
     static IPAddress localIP();
     static IPAddress subnetMask();
     static IPAddress gatewayIP();
-    static IPAddress dnsServerIP() { return _dnsServerAddress; }
+    static const IPAddress& dnsServerIP() { return _dnsServerAddress; }
 
     void setMACAddress(const uint8_t *mac_address);
     void setLocalIP(const IPAddress local_ip);
@@ -113,12 +112,12 @@ class EthernetClass {
   private:
     // Opens a socket(TCP or UDP or IP_RAW mode)
     static uint8_t socketBegin(uint8_t protocol, uint16_t port);
-    static uint8_t socketBeginMulticast(uint8_t protocol, IPAddress ip, uint16_t port);
+    static uint8_t socketBeginMulticast(uint8_t protocol, const IPAddress ip, uint16_t port);
     static uint8_t socketStatus(uint8_t s);
     // Close socket
     static void socketClose(uint8_t s);
     // Establish TCP connection (Active connection)
-    static void socketConnect(uint8_t s, uint8_t *addr, uint16_t port);
+    static void socketConnect(uint8_t s, const uint8_t *addr, uint16_t port);
     // disconnect the connection
     static void socketDisconnect(uint8_t s);
     // Establish TCP connection (Passive connection)
@@ -133,7 +132,7 @@ class EthernetClass {
     // sets up a UDP datagram, the data for which will be provided by one
     // or more calls to bufferData and then finally sent with sendUDP.
     // return true if the datagram was successfully set up, or false if there was an error
-    static bool socketStartUDP(uint8_t s, uint8_t *addr, uint16_t port);
+    static bool socketStartUDP(uint8_t s, const uint8_t *addr, uint16_t port);
     // copy up to len bytes of data from buf into a UDP datagram to be
     // sent later by sendUDP.  Allows datagrams to be built up from a series of bufferData calls.
     // return Number of bytes successfully buffered
@@ -162,82 +161,81 @@ class EthernetUDP : public UDP {
     uint16_t _remaining; // remaining bytes of incoming packet yet to be processed
 
   public:
-    EthernetUDP() : sockindex(MAX_SOCK_NUM) {}           // Constructor
-    virtual uint8_t begin(uint16_t);                     // initialize, start listening on specified port. Returns 1 if successful, 0 if there are no sockets available to use
-    virtual uint8_t beginMulticast(IPAddress, uint16_t); // initialize, start listening on specified port. Returns 1 if successful, 0 if there are no sockets available to use
-    virtual void stop();                                 // Finish with the UDP socket
+    EthernetUDP() : sockindex(MAX_SOCK_NUM) {}                    // Constructor
+    virtual uint8_t begin(uint16_t) override;                     // initialize, start listening on specified port. Returns 1 if successful, 0 if there are no sockets available to use
+    virtual uint8_t beginMulticast(IPAddress, uint16_t) override; // initialize, start listening on specified port. Returns 1 if successful, 0 if there are no sockets available to use
+    virtual void stop() override;                                 // Finish with the UDP socket
 
     // Sending UDP packets
 
     // Start building up a packet to send to the remote host specific in ip and port
     // Returns 1 if successful, 0 if there was a problem with the supplied IP address or port
-    virtual int beginPacket(IPAddress ip, uint16_t port);
+    virtual int beginPacket(IPAddress ip, uint16_t port) override;
     // Start building up a packet to send to the remote host specific in host and port
     // Returns 1 if successful, 0 if there was a problem resolving the hostname or port
-    virtual int beginPacket(const char *host, uint16_t port);
+    virtual int beginPacket(const char *host, uint16_t port) override;
     // Finish off this packet and send it
     // Returns 1 if the packet was sent successfully, 0 if there was an error
-    virtual int endPacket();
+    virtual int endPacket() override;
     // Write a single byte into the packet
-    virtual size_t write(uint8_t);
+    virtual size_t write(uint8_t) override;
     // Write size bytes from buffer into the packet
-    virtual size_t write(const uint8_t *buffer, size_t size);
+    virtual size_t write(const uint8_t *buffer, size_t size) override;
 
     using Print::write;
 
     // Start processing the next available incoming packet
     // Returns the size of the packet in bytes, or 0 if no packets are available
-    virtual int parsePacket();
+    virtual int parsePacket() override;
     // Number of bytes remaining in the current packet
-    virtual int available();
+    virtual int available() override;
     // Read a single byte from the current packet
-    virtual int read();
+    virtual int read() override;
     // Read up to len bytes from the current packet and place them into buffer
     // Returns the number of bytes read, or 0 if none are available
-    virtual int read(unsigned char *buffer, size_t len);
+    virtual int read(unsigned char *buffer, size_t len) override;
     // Read up to len characters from the current packet and place them into buffer
     // Returns the number of characters read, or 0 if none are available
-    virtual int read(char *buffer, size_t len) { return read((unsigned char *)buffer, len); };
+    virtual int read(char *buffer, size_t len) override { return read((unsigned char *)buffer, len); };
     // Return the next byte from the current packet without moving on to the next byte
-    virtual int peek();
-    virtual void flush(); // Finish reading the current packet
+    virtual int peek() override;
+    virtual void flush() override; // Finish reading the current packet
 
     // Return the IP address of the host who sent the current incoming packet
-    virtual IPAddress remoteIP() { return _remoteIP; };
+    virtual IPAddress remoteIP() override { return _remoteIP; };
     // Return the port of the host who sent the current incoming packet
-    virtual uint16_t remotePort() { return _remotePort; };
-    virtual uint16_t localPort() { return _port; }
+    virtual uint16_t remotePort() override  { return _remotePort; };
+    uint16_t localPort() const { return _port; }
 };
 
 class EthernetClient : public Client {
   public:
     EthernetClient() : _sockindex(MAX_SOCK_NUM), _timeout(1000) {}
     EthernetClient(uint8_t s) : _sockindex(s), _timeout(1000) {}
-    virtual ~EthernetClient(){};
 
     uint8_t status();
-    virtual int connect(IPAddress ip, uint16_t port);
-    virtual int connect(const char *host, uint16_t port);
-    virtual int availableForWrite(void);
-    virtual size_t write(uint8_t);
-    virtual size_t write(const uint8_t *buf, size_t size);
-    virtual int available();
-    virtual int read();
-    virtual int read(uint8_t *buf, size_t size);
-    virtual int peek();
-    virtual void flush();
-    virtual void stop();
-    virtual uint8_t connected();
-    virtual operator bool() { return _sockindex < MAX_SOCK_NUM; }
-    virtual bool operator==(const bool value) { return bool() == value; }
-    virtual bool operator!=(const bool value) { return bool() != value; }
-    virtual bool operator==(const EthernetClient &);
-    virtual bool operator!=(const EthernetClient &rhs) { return !this->operator==(rhs); }
+    virtual int connect(IPAddress ip, uint16_t port) override;
+    virtual int connect(const char *host, uint16_t port) override;
+    virtual int availableForWrite(void) override;
+    virtual size_t write(uint8_t) override;
+    virtual size_t write(const uint8_t *buf, size_t size) override;
+    virtual int available() override;
+    virtual int read() override;
+    virtual int read(uint8_t *buf, size_t size) override;
+    virtual int peek() override;
+    virtual void flush() override;
+    virtual void stop() override;
+    virtual uint8_t connected() override;
+    virtual operator bool() override { return _sockindex < MAX_SOCK_NUM; }
+    bool operator==(const bool value) { return bool() == value; }
+    bool operator!=(const bool value) { return bool() != value; }
+    bool operator==(const EthernetClient &);
+    bool operator!=(const EthernetClient &rhs) { return !this->operator==(rhs); }
     uint8_t getSocketNumber() const { return _sockindex; }
-    virtual uint16_t localPort();
-    virtual IPAddress remoteIP();
-    virtual uint16_t remotePort();
-    virtual void setConnectionTimeout(uint16_t timeout) { _timeout = timeout; }
+    uint16_t localPort() const;
+    IPAddress remoteIP() const;
+    uint16_t remotePort() const;
+    void setConnectionTimeout(uint16_t timeout) { _timeout = timeout; }
 
     friend class EthernetServer;
 
@@ -256,10 +254,10 @@ class EthernetServer : public Server {
     EthernetServer(uint16_t port) : _port(port) {}
     EthernetClient available();
     EthernetClient accept();
-    virtual void begin();
-    virtual size_t write(uint8_t);
-    virtual size_t write(const uint8_t *buf, size_t size);
-    virtual operator bool();
+    virtual void begin() override;
+    virtual size_t write(uint8_t) override;
+    virtual size_t write(const uint8_t *buf, size_t size) override;
+    operator bool() const;
     using Print::write;
     // void statusreport();
 
@@ -299,18 +297,18 @@ class DhcpClass {
     void reset_DHCP_lease();
     void presend_DHCP();
     void send_DHCP_MESSAGE(uint8_t, uint16_t);
-    void printByte(char *, uint8_t);
+    static void printByte(char *, uint8_t);
 
     uint8_t parseDHCPResponse(unsigned long responseTimeout, uint32_t &transactionId);
 
   public:
-    IPAddress getLocalIp();
-    IPAddress getSubnetMask();
-    IPAddress getGatewayIp();
-    IPAddress getDhcpServerIp();
-    IPAddress getDnsServerIp();
+    IPAddress getLocalIp() const;
+    IPAddress getSubnetMask() const;
+    IPAddress getGatewayIp() const;
+    IPAddress getDhcpServerIp() const;
+    IPAddress getDnsServerIp() const;
 
-    int beginWithDHCP(uint8_t *, unsigned long timeout = 60000, unsigned long responseTimeout = 4000);
+    int beginWithDHCP(const uint8_t *, unsigned long timeout = 60000, unsigned long responseTimeout = 4000);
     int checkLease();
 };
 

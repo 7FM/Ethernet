@@ -26,10 +26,10 @@
  * bjoern@cs.stanford.edu 12/30/2008
  */
 
-#include "Dns.h"
 #include "Ethernet.h"
+
+#include "Dns.h"
 #include "utility/w5100.h"
-#include <Arduino.h>
 
 /* Start EthernetUDP socket, listening at local port PORT */
 uint8_t EthernetUDP::begin(uint16_t port) {

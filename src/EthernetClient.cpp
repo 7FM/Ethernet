@@ -18,10 +18,10 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "Dns.h"
 #include "Ethernet.h"
+
+#include "Dns.h"
 #include "utility/w5100.h"
-#include <Arduino.h>
 
 int EthernetClient::connect(const char *host, uint16_t port) {
     DNSClient dns; // Look up the host first
@@ -188,7 +188,7 @@ bool EthernetClient::operator==(const EthernetClient &rhs) {
 
 // https://github.com/per1234/EthernetMod
 // from: https://github.com/ntruchsess/Arduino-1/commit/937bce1a0bb2567f6d03b15df79525569377dabd
-uint16_t EthernetClient::localPort() {
+uint16_t EthernetClient::localPort() const {
     if (_sockindex >= MAX_SOCK_NUM)
         return 0;
     uint16_t port;
@@ -200,7 +200,7 @@ uint16_t EthernetClient::localPort() {
 
 // https://github.com/per1234/EthernetMod
 // returns the remote IP address: https://forum.arduino.cc/index.php?topic=82416.0
-IPAddress EthernetClient::remoteIP() {
+IPAddress EthernetClient::remoteIP() const {
     if (_sockindex >= MAX_SOCK_NUM)
         return IPAddress((uint32_t)0);
     uint8_t remoteIParray[4];
@@ -212,7 +212,7 @@ IPAddress EthernetClient::remoteIP() {
 
 // https://github.com/per1234/EthernetMod
 // from: https://github.com/ntruchsess/Arduino-1/commit/ca37de4ba4ecbdb941f14ac1fe7dd40f3008af75
-uint16_t EthernetClient::remotePort() {
+uint16_t EthernetClient::remotePort() const {
     if (_sockindex >= MAX_SOCK_NUM)
         return 0;
     uint16_t port;
