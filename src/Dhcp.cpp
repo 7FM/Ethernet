@@ -1,10 +1,11 @@
 // DHCP Library v0.3 - April 25, 2009
 // Author: Jordan Terrell - blog.jordanterrell.com
 
+#include <Arduino.h>
+
 #include "Dhcp.h"
 #include "Ethernet.h"
 #include "utility/w5100.h"
-#include <Arduino.h>
 
 int DhcpClass::beginWithDHCP(uint8_t *mac, unsigned long timeout, unsigned long responseTimeout) {
     _dhcpLeaseTime = 0;

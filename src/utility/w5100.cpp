@@ -8,9 +8,9 @@
  * published by the Free Software Foundation.
  */
 
-#include "w5100.h"
 #include "Ethernet.h"
-#include <Arduino.h>
+
+#include "w5100.h"
 
 /***************************************************/
 /**            Default SS pin setting             **/
