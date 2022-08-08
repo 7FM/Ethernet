@@ -93,7 +93,7 @@ uint8_t W5100Class::init(void) {
     // case maximum 560 ms pulse length.  This delay is meant to wait
     // until the reset pulse is ended.  If your hardware has a shorter
     // reset time, this can be edited or removed.
-    delay(560);
+    _delay_ms(560);
     // Serial.println("w5100 init");
 
     SPI.begin();
@@ -206,7 +206,7 @@ uint8_t W5100Class::softReset(void) {
         // Serial.println(mr, HEX);
         if (mr == 0)
             return 1;
-        delay(1);
+        _delay_ms(1);
     } while (++count < 20);
     return 0;
 }

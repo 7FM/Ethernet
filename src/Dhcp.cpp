@@ -232,13 +232,14 @@ uint8_t DhcpClass::parseDHCPResponse(unsigned long responseTimeout, uint32_t &tr
     uint8_t type = 0;
     uint8_t opt_len = 0;
 
-    unsigned long startTime = millis();
+    unsigned long timePassed = 0;
 
     while (_dhcpUdpSocket.parsePacket() <= 0) {
-        if ((millis() - startTime) > responseTimeout) {
+        if (timePassed > responseTimeout) {
             return 255;
         }
-        delay(50);
+        timePassed += 55;
+        _delay_ms(50);
     }
     // start reading in the packet
     RIP_MSG_FIXED fixedMsg;

@@ -205,14 +205,15 @@ uint16_t DNSClient::BuildRequest(const char *aName) {
 }
 
 uint16_t DNSClient::ProcessResponse(uint16_t aTimeout, IPAddress &aAddress) {
-    uint32_t startTime = millis();
+    uint32_t timePassed = 0;
 
     // Wait for a response packet
     while (iUdp.parsePacket() <= 0) {
-        if ((millis() - startTime) > aTimeout) {
+        if (timePassed > aTimeout) {
             return TIMED_OUT;
         }
-        delay(50);
+        timePassed += 55;
+        _delay_ms(50);
     }
 
     // We've had a reply!
