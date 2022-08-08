@@ -1,15 +1,17 @@
 /*
- *  Udp.cpp: Library to send/receive UDP packets with the Arduino Ethernet Shield.
- *  This version only offers minimal wrapping of socket.cpp
- *  Drop Udp.h/.cpp into the Ethernet library directory at hardware/libraries/Ethernet/
+ *  Udp.cpp: Library to send/receive UDP packets with the Arduino Ethernet
+ * Shield. This version only offers minimal wrapping of socket.cpp Drop
+ * Udp.h/.cpp into the Ethernet library directory at
+ * hardware/libraries/Ethernet/
  *
- * NOTE: UDP is fast, but has some important limitations (thanks to Warren Gray for mentioning these)
- * 1) UDP does not guarantee the order in which assembled UDP packets are received. This
- * might not happen often in practice, but in larger network topologies, a UDP
- * packet can be received out of sequence.
- * 2) UDP does not guard against lost packets - so packets *can* disappear without the sender being
- * aware of it. Again, this may not be a concern in practice on small local networks.
- * For more information, see http://www.cafeaulait.org/course/week12/35.html
+ * NOTE: UDP is fast, but has some important limitations (thanks to Warren Gray
+ * for mentioning these) 1) UDP does not guarantee the order in which assembled
+ * UDP packets are received. This might not happen often in practice, but in
+ * larger network topologies, a UDP packet can be received out of sequence. 2)
+ * UDP does not guard against lost packets - so packets *can* disappear without
+ * the sender being aware of it. Again, this may not be a concern in practice on
+ * small local networks. For more information, see
+ * http://www.cafeaulait.org/course/week12/35.html
  *
  * MIT License:
  * Copyright (c) 2008 Bjoern Hartmann
