@@ -83,6 +83,7 @@ int DNSClient::inet_aton(const char *address, IPAddress &result) {
 
 int DNSClient::getHostByName(const char *aHostname, IPAddress &aResult,
                              uint16_t timeout) {
+  static uint8_t wtf = 0;
   int ret = 0;
 
   // See if it's a numeric IP address
@@ -97,7 +98,7 @@ int DNSClient::getHostByName(const char *aHostname, IPAddress &aResult,
   }
 
   // Find a socket to use
-  if (iUdp.begin(1024 + (millis() & 0xF)) == 1) {
+  if (iUdp.begin(1024 + ((wtf++) & 0xF)) == 1) {
     // Try up to three times
     int retries = 0;
     // while ((retries < 3) && (ret <= 0)) {
@@ -131,6 +132,7 @@ int DNSClient::getHostByName(const char *aHostname, IPAddress &aResult,
 }
 
 uint16_t DNSClient::BuildRequest(const char *aName) {
+  static uint16_t id; // Do not initialize for some "randomness"
   // Build header
   //                                    1  1  1  1  1  1
   //      0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
@@ -149,7 +151,7 @@ uint16_t DNSClient::BuildRequest(const char *aName) {
   //    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
   // As we only support one request at a time at present, we can simplify
   // some of this header
-  iRequestId = millis(); // generate a random ID
+  iRequestId = ++id; // generate a random ID
   uint16_t twoByteBuffer;
 
   // FIXME We should also check that there's enough space available to write to,

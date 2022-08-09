@@ -47,16 +47,16 @@ int DhcpClass::request_DHCP_lease() {
 
   int result = 0;
 
-  unsigned long startTime = millis();
+  uint16_t timePassed = 0;
 
   while (_dhcp_state != STATE_DHCP_LEASED) {
     if (_dhcp_state == STATE_DHCP_START) {
       _dhcpTransactionId++;
-      send_DHCP_MESSAGE(DHCP_DISCOVER, ((millis() - startTime) / 1000));
+      send_DHCP_MESSAGE(DHCP_DISCOVER, timePassed++);
       _dhcp_state = STATE_DHCP_DISCOVER;
     } else if (_dhcp_state == STATE_DHCP_REREQUEST) {
       _dhcpTransactionId++;
-      send_DHCP_MESSAGE(DHCP_REQUEST, ((millis() - startTime) / 1000));
+      send_DHCP_MESSAGE(DHCP_REQUEST, timePassed++);
       _dhcp_state = STATE_DHCP_REQUEST;
     } else if (_dhcp_state == STATE_DHCP_DISCOVER) {
       uint32_t respId;
@@ -65,7 +65,7 @@ int DhcpClass::request_DHCP_lease() {
         // We'll use the transaction ID that the offer came with,
         // rather than the one we were up to
         _dhcpTransactionId = respId;
-        send_DHCP_MESSAGE(DHCP_REQUEST, ((millis() - startTime) / 1000));
+        send_DHCP_MESSAGE(DHCP_REQUEST, timePassed++);
         _dhcp_state = STATE_DHCP_REQUEST;
       }
     } else if (_dhcp_state == STATE_DHCP_REQUEST) {
@@ -99,7 +99,7 @@ int DhcpClass::request_DHCP_lease() {
       _dhcp_state = STATE_DHCP_START;
     }
 
-    if (result != 1 && ((millis() - startTime) > _timeout))
+    if (result != 1 && timePassed > _timeout)
       break;
   }
 
@@ -107,7 +107,7 @@ int DhcpClass::request_DHCP_lease() {
   _dhcpUdpSocket.stop();
   _dhcpTransactionId++;
 
-  _lastCheckLeaseMillis = millis();
+  _lastCheckLeaseMillis = 42;
   return result;
 }
 
@@ -352,29 +352,21 @@ uint8_t DhcpClass::parseDHCPResponse(unsigned long responseTimeout,
 int DhcpClass::checkLease() {
   int rc = DHCP_CHECK_NONE;
 
-  unsigned long now = millis();
-  unsigned long elapsed = now - _lastCheckLeaseMillis;
+  uint8_t elapsed = 1;
 
-  // if more then one sec passed, reduce the counters accordingly
-  if (elapsed >= 1000) {
-    // set the new timestamps
-    _lastCheckLeaseMillis = now - (elapsed % 1000);
-    elapsed = elapsed / 1000;
-
-    // decrease the counters by elapsed seconds
-    // we assume that the cycle time (elapsed) is fairly constant
-    // if the remainder is less than cycle time * 2
-    // do it early instead of late
-    if (_renewInSec < elapsed * 2) {
-      _renewInSec = 0;
-    } else {
-      _renewInSec -= elapsed;
-    }
-    if (_rebindInSec < elapsed * 2) {
-      _rebindInSec = 0;
-    } else {
-      _rebindInSec -= elapsed;
-    }
+  // decrease the counters by elapsed seconds
+  // we assume that the cycle time (elapsed) is fairly constant
+  // if the remainder is less than cycle time * 2
+  // do it early instead of late
+  if (_renewInSec < elapsed * 2) {
+    _renewInSec = 0;
+  } else {
+    _renewInSec -= elapsed;
+  }
+  if (_rebindInSec < elapsed * 2) {
+    _rebindInSec = 0;
+  } else {
+    _rebindInSec -= elapsed;
   }
 
   // if we have a lease but should renew, do it
