@@ -27,6 +27,8 @@
 IPAddress EthernetClass::_dnsServerAddress;
 DhcpClass *EthernetClass::_dhcp = NULL;
 
+void EthernetClass::end() { W5100.end(); }
+
 int EthernetClass::begin(const uint8_t *mac, unsigned long timeout,
                          unsigned long responseTimeout) {
   static DhcpClass s_dhcp;

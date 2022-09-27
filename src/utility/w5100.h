@@ -121,6 +121,7 @@ class W5100Class {
 
 public:
   static uint8_t init(void);
+  static void end(void);
 
   inline void setGatewayIp(const uint8_t *addr) { writeGAR(addr); }
   inline void getGatewayIp(uint8_t *addr) { readGAR(addr); }

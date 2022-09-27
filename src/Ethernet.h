@@ -91,6 +91,7 @@ public:
   static void begin(const uint8_t *mac, const IPAddress &ip,
                     const IPAddress &dns, const IPAddress &gateway,
                     const IPAddress &subnet);
+  static void end();
   static void init(uint8_t sspin = 10);
 
   static void MACAddress(uint8_t *mac_address);

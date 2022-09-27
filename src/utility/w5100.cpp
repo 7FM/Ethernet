@@ -82,12 +82,10 @@ volatile uint32_t *W5100Class::ss_pin_reg;
 uint32_t W5100Class::ss_pin_mask;
 #endif
 
-uint8_t W5100Class::init(void) {
-  static bool initialized = false;
-  uint8_t i;
+void W5100Class::end(void) { SPI.end(); }
 
-  if (initialized)
-    return 1;
+uint8_t W5100Class::init(void) {
+  uint8_t i;
 
   // Many Ethernet shields have a CAT811 or similar reset chip
   // connected to W5100 or W5200 chips.  The W5200 will not work at
@@ -192,7 +190,6 @@ uint8_t W5100Class::init(void) {
     return 0; // no known chip is responding :-(
   }
   SPI.endTransaction();
-  initialized = true;
   return 1; // successful init
 }
 
