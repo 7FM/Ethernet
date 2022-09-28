@@ -52,6 +52,7 @@
 uint8_t W5100Class::chip = 0;
 uint8_t W5100Class::CH_BASE_MSB;
 uint8_t W5100Class::ss_pin = SS_PIN_DEFAULT;
+bool W5100Class::initialized = false;
 #ifdef ETHERNET_LARGE_BUFFERS
 uint16_t W5100Class::SSIZE = 2048;
 uint16_t W5100Class::SMASK = 0x07FF;
@@ -82,10 +83,14 @@ volatile uint32_t *W5100Class::ss_pin_reg;
 uint32_t W5100Class::ss_pin_mask;
 #endif
 
-void W5100Class::end(void) { SPI.end(); }
+void W5100Class::end(void) {
+  SPI.end();
+  initialized = false;
+}
 
 uint8_t W5100Class::init(void) {
-  uint8_t i;
+  if (initialized)
+    return 1;
 
   // Many Ethernet shields have a CAT811 or similar reset chip
   // connected to W5100 or W5200 chips.  The W5200 will not work at
@@ -121,6 +126,7 @@ uint8_t W5100Class::init(void) {
 #endif
     SMASK = SSIZE - 1;
 #endif
+    uint8_t i;
     for (i = 0; i < MAX_SOCK_NUM; i++) {
       writeSnRX_SIZE(i, SSIZE >> 10);
       writeSnTX_SIZE(i, SSIZE >> 10);
@@ -145,6 +151,7 @@ uint8_t W5100Class::init(void) {
     SSIZE = 2048;
 #endif
     SMASK = SSIZE - 1;
+    uint8_t i;
     for (i = 0; i < MAX_SOCK_NUM; i++) {
       writeSnRX_SIZE(i, SSIZE >> 10);
       writeSnTX_SIZE(i, SSIZE >> 10);
@@ -190,6 +197,7 @@ uint8_t W5100Class::init(void) {
     return 0; // no known chip is responding :-(
   }
   SPI.endTransaction();
+  initialized = true;
   return 1; // successful init
 }
 

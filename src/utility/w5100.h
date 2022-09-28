@@ -119,6 +119,9 @@ enum W5100Linkstatus { UNKNOWN, LINK_ON, LINK_OFF };
 
 class W5100Class {
 
+private:
+  static bool initialized;
+
 public:
   static uint8_t init(void);
   static void end(void);
